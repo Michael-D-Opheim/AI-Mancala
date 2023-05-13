@@ -57,7 +57,7 @@ public class ArtificialIntelligenceAgent {
 				MancalaModel localCopy = new MancalaModel();
 				localCopy.setBoard(aiModel.getBoard(), 1);
 				
-				System.out.println(recursiveIndent + "hole:" + hole);
+				System.out.println(recursiveIndent + "Hole:" + hole);
 
 				localCopy.moveStones(hole);
 

@@ -249,6 +249,7 @@ public class MancalaView extends Application {
 						}
 
 						if (!model.getIsHumanGame()) {
+							System.out.println("AI Turn:");
 							while (model.getCurrentPlayer() == 1) {
 								runAI();
 								System.out.println("\n-------------\n");
