@@ -138,12 +138,12 @@ public class MancalaView extends Application {
 	// Have AI make a turn
 	private void runAI() {
 		if (!model.getIsHumanGame()) {
-			try {
-				Thread.sleep(400);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			try {
+////				Thread.sleep(400); //TODO: move this
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			ArtificialIntelligenceAgent aiAgent = new ArtificialIntelligenceAgent();
 			int aiMove = aiAgent.optimalMove(model);
 			model.moveStones(aiMove);

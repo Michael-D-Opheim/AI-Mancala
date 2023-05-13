@@ -39,14 +39,14 @@ public class MancalaModel {
 		isHumanGame = false;
 	}
 
-	public void setBoard(int[][] currentBoard) {
+	public void setBoard(int[][] currentBoard, int player) {
 		for (int row = 0; row < currentBoard.length; row++) {
 			for (int col = 0; col < currentBoard[row].length; col++) {
 				board[row][col] = currentBoard[row][col];
 			}
 		}
 		
-		row = 0;
+		row = player;
 	}
 
 	// TODO: add in method for initializing board at current state each time

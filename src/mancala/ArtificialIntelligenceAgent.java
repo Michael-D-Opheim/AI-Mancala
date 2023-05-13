@@ -25,13 +25,12 @@ public class ArtificialIntelligenceAgent {
 		// Store the state of the current game so we can run simulations on it without
 		// altering our actual game
 		aiModel = new MancalaModel();
-		aiModel.setBoard(model.getBoard());
+		aiModel.setBoard(model.getBoard(), 1);
 
 		// Run simulations on the game to find an optimal move for our AI MAX player
 		optimalMove = findOptimalMove(aiModel.getBoard()).getHole();
 
 		// Return the most optimal move once we have found it via our simulations
-		System.out.println(optimalMove);
 		return optimalMove;
 	}
 
@@ -44,7 +43,7 @@ public class ArtificialIntelligenceAgent {
 	 * @return The most optimal move for the AI player
 	 */
 	private BestMoveBoardValue findOptimalMove(int[][] board) {
-		
+
 		// Create an object to the most optimal move for the AI players
 		BestMoveBoardValue optimalMove = new BestMoveBoardValue(-1, 0);
 
@@ -56,9 +55,14 @@ public class ArtificialIntelligenceAgent {
 			if (board[1][hole] != 0) {
 
 				MancalaModel localCopy = new MancalaModel();
-				localCopy.setBoard(aiModel.getBoard());
+				localCopy.setBoard(aiModel.getBoard(), 1);
+				
+				System.out.println("Row before:" + localCopy.getCurrentPlayer());
 
 				localCopy.moveStones(hole);
+
+				
+				System.out.println("hole:" + hole + ", P2 Store:" + localCopy.getP2Store() + ", row after:" + localCopy.getCurrentPlayer());
 
 				if (value < localCopy.getP2Store()) {
 					value = localCopy.getP2Store();
@@ -67,6 +71,8 @@ public class ArtificialIntelligenceAgent {
 				}
 			}
 		}
+
+		System.out.println("hole:" + optimalMove.getHole() + ", value:" + optimalMove.getValue());
 
 		return optimalMove;
 	}
