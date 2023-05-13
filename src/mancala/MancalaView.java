@@ -145,7 +145,7 @@ public class MancalaView extends Application {
 //				e.printStackTrace();
 //			}
 			ArtificialIntelligenceAgent aiAgent = new ArtificialIntelligenceAgent();
-			int aiMove = aiAgent.optimalMove(model);
+			int aiMove = aiAgent.optimalMove(model, "");
 			model.moveStones(aiMove);
 
 			// Recreate the board to reflect the changes made from stones being moved
@@ -251,6 +251,7 @@ public class MancalaView extends Application {
 						if (!model.getIsHumanGame()) {
 							while (model.getCurrentPlayer() == 1) {
 								runAI();
+								System.out.println("\n-------------\n");
 							}
 						}
 					}

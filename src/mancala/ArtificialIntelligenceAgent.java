@@ -18,7 +18,7 @@ public class ArtificialIntelligenceAgent {
 	 * @param model A reference to the model
 	 * @return the most optimal move for the AI to take
 	 */
-	public int optimalMove(MancalaModel model) {
+	public int optimalMove(MancalaModel model, String recursiveIndent) {
 
 		int optimalMove = 0;
 
@@ -28,7 +28,7 @@ public class ArtificialIntelligenceAgent {
 		aiModel.setBoard(model.getBoard(), 1);
 
 		// Run simulations on the game to find an optimal move for our AI MAX player
-		optimalMove = findOptimalMove(aiModel.getBoard()).getHole();
+		optimalMove = findOptimalMove(aiModel.getBoard(), recursiveIndent).getHole();
 
 		// Return the most optimal move once we have found it via our simulations
 		return optimalMove;
@@ -42,7 +42,7 @@ public class ArtificialIntelligenceAgent {
 	 * @param currentDepth The depth of MINIMAX tree we are analyzing
 	 * @return The most optimal move for the AI player
 	 */
-	private BestMoveBoardValue findOptimalMove(int[][] board) {
+	private BestMoveBoardValue findOptimalMove(int[][] board, String recursiveIndent) {
 
 		// Create an object to the most optimal move for the AI players
 		BestMoveBoardValue optimalMove = new BestMoveBoardValue(-1, 0);
@@ -57,12 +57,16 @@ public class ArtificialIntelligenceAgent {
 				MancalaModel localCopy = new MancalaModel();
 				localCopy.setBoard(aiModel.getBoard(), 1);
 				
-				System.out.println("Row before:" + localCopy.getCurrentPlayer());
+				System.out.println(recursiveIndent + "hole:" + hole);
 
 				localCopy.moveStones(hole);
 
-				
-				System.out.println("hole:" + hole + ", P2 Store:" + localCopy.getP2Store() + ", row after:" + localCopy.getCurrentPlayer());
+				if (localCopy.getCurrentPlayer() == 1) {
+					int holeToCheck = optimalMove(localCopy, recursiveIndent + "   ");
+					localCopy.moveStones(holeToCheck);
+				}
+
+				System.out.println(recursiveIndent + "P2 Store:" + localCopy.getP2Store() + "\n");
 
 				if (value < localCopy.getP2Store()) {
 					value = localCopy.getP2Store();
@@ -71,8 +75,8 @@ public class ArtificialIntelligenceAgent {
 				}
 			}
 		}
-
-		System.out.println("hole:" + optimalMove.getHole() + ", value:" + optimalMove.getValue());
+		
+		System.out.println(recursiveIndent + "Most optimal move: " + optimalMove.getHole());
 
 		return optimalMove;
 	}
