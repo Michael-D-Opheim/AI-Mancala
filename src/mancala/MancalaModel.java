@@ -109,12 +109,6 @@ public class MancalaModel {
 		for (int row = 0; row < board.length; row++) {
 			for (int column = 0; column < board[row].length; column++) {
 				board[row][column] = 6;
-//				if (column < 2) {
-//					board[row][column] = 0;
-//				} else {
-//				board[row][column] = Math.abs(column - 6);
-//			}
-
 			}
 		}
 	}

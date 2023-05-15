@@ -24,7 +24,7 @@ import javafx.stage.Stage;
  * @author Michael Opheim
  * @version 05/09/2023
  */
-//TODO: comments, timing, capture (if two holes have same outcome pick the hole with the most stones in it)
+//TODO: comments, timing
 public class MancalaView extends Application {
 
 	/** A reference to the model of the GUI */
@@ -238,7 +238,7 @@ public class MancalaView extends Application {
 
 						// Else, the current player made a valid move, so move the stones accordingly
 					} else {
-						if (model.getCurrentPlayer() == 0) {
+						if (model.getCurrentPlayer() == 0 || (model.getCurrentPlayer() == 1 && model.getIsHumanGame())) {
 							model.moveStones(finalCounter);
 
 							// Recreate the board to reflect the changes made from stones being moved
