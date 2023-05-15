@@ -48,7 +48,7 @@ public class ArtificialIntelligenceAgent {
 
 		int value = -1;
 
-		for (int hole = 5; hole >= 0; hole--) {
+		for (int hole = 0; hole < 6; hole++) {
 
 			// Make sure that the hole contains stones
 			if (aiModel.getBoard()[1][hole] != 0) {
