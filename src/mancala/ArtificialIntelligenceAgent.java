@@ -6,11 +6,10 @@ package mancala;
  * @author Michael Opheim
  * @version 05/09/2023
  */
-//TODO: comment, check
 public class ArtificialIntelligenceAgent {
 
 	/** A copy of the game in its current state for simulations */
-	private MancalaModel aiModel;
+//	private MancalaModel aiModel;
 
 	/**
 	 * A method that picks the optimal move for a turn
@@ -24,11 +23,11 @@ public class ArtificialIntelligenceAgent {
 
 		// Store the state of the current game so we can run simulations on it without
 		// altering our actual game
-		aiModel = new MancalaModel();
-		aiModel.setBoard(model.getBoard(), 1);
+		MancalaModel aiModel = new MancalaModel();
+		aiModel.copy(model.getBoard(), 1, model.getP1Store(), model.getP2Store());
 
 		// Run simulations on the game to find an optimal move for our AI MAX player
-		optimalMove = findOptimalMove(aiModel.getBoard(), recursiveIndent).getHole();
+		optimalMove = findOptimalMove(aiModel, recursiveIndent).getHole();
 
 		// Return the most optimal move once we have found it via our simulations
 		return optimalMove;
@@ -42,41 +41,47 @@ public class ArtificialIntelligenceAgent {
 	 * @param currentDepth The depth of MINIMAX tree we are analyzing
 	 * @return The most optimal move for the AI player
 	 */
-	private BestMoveBoardValue findOptimalMove(int[][] board, String recursiveIndent) {
+	private BestMoveBoardValue findOptimalMove(MancalaModel aiModel, String recursiveIndent) {
 
 		// Create an object to the most optimal move for the AI players
 		BestMoveBoardValue optimalMove = new BestMoveBoardValue(-1, 0);
 
 		int value = -1;
 
-		for (int hole = 0; hole < 6; hole++) {
+		for (int hole = 5; hole >= 0; hole--) {
 
 			// Make sure that the hole contains stones
-			if (board[1][hole] != 0) {
+			if (aiModel.getBoard()[1][hole] != 0) {
 
 				MancalaModel localCopy = new MancalaModel();
-				localCopy.setBoard(aiModel.getBoard(), 1);
-				
-				System.out.println(recursiveIndent + "Hole:" + hole);
+				localCopy.copy(aiModel.getBoard(), 1, aiModel.getP1Store(), aiModel.getP2Store());
+
+				System.out.println(recursiveIndent + "Hole:" + hole + " Score before stone move: " + localCopy.getP2Store());
 
 				localCopy.moveStones(hole);
 
-				if (localCopy.getCurrentPlayer() == 1) {
+				System.out.println(recursiveIndent + "Score after stone move" + localCopy.getP2Store());
+				
+				while (localCopy.getCurrentPlayer() == 1) {
 					int holeToCheck = optimalMove(localCopy, recursiveIndent + "   ");
+					System.out.println(recursiveIndent + "Best Hole: " + holeToCheck + " Score before: " + localCopy.getP2Store());
 					localCopy.moveStones(holeToCheck);
+					System.out.println(recursiveIndent + "Score after: " + localCopy.getP2Store());
 				}
 
-				System.out.println(recursiveIndent + "P2 Store:" + localCopy.getP2Store() + "\n");
+				System.out.println(recursiveIndent + "hole: " + hole + " Potential value:" + localCopy.getP2Store() + "\n");
 
 				if (value < localCopy.getP2Store()) {
 					value = localCopy.getP2Store();
 					optimalMove.setValue(value);
 					optimalMove.setHole(hole);
 				}
+			} else {
+				System.out.println(recursiveIndent + "hole " + hole + " was empty");
 			}
 		}
-		
-		System.out.println(recursiveIndent + "Most optimal move: " + optimalMove.getHole());
+
+		System.out.println(recursiveIndent + "Most optimal move: " + optimalMove.getHole() + " Value: " + optimalMove.getValue());
 
 		return optimalMove;
 	}

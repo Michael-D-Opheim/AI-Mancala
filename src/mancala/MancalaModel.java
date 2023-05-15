@@ -39,17 +39,18 @@ public class MancalaModel {
 		isHumanGame = false;
 	}
 
-	public void setBoard(int[][] currentBoard, int player) {
+	public void copy(int[][] currentBoard, int player, int p1Store, int p2Store) {
 		for (int row = 0; row < currentBoard.length; row++) {
 			for (int col = 0; col < currentBoard[row].length; col++) {
 				board[row][col] = currentBoard[row][col];
 			}
 		}
-		
-		row = player;
-	}
 
-	// TODO: add in method for initializing board at current state each time
+		row = player;
+		this.p1Store = p1Store;
+		this.p2Store = p2Store;
+
+	}
 
 	/**
 	 * The getter for the mancala board
@@ -107,7 +108,13 @@ public class MancalaModel {
 		// Fill each slot in the board with six stones
 		for (int row = 0; row < board.length; row++) {
 			for (int column = 0; column < board[row].length; column++) {
-				board[row][column] = 4;
+				board[row][column] = 6;
+//				if (column < 2) {
+//					board[row][column] = 0;
+//				} else {
+//				board[row][column] = Math.abs(column - 6);
+//			}
+
 			}
 		}
 	}

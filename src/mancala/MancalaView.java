@@ -1,5 +1,7 @@
 package mancala;
 
+import java.util.concurrent.TimeUnit;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,8 +24,7 @@ import javafx.stage.Stage;
  * @author Michael Opheim
  * @version 05/09/2023
  */
-
-//TODO: comments
+//TODO: comments, timing, capture (if two holes have same outcome pick the hole with the most stones in it)
 public class MancalaView extends Application {
 
 	/** A reference to the model of the GUI */
@@ -35,6 +36,8 @@ public class MancalaView extends Application {
 	private Button gameButtonAI;
 
 	private Button gameButtonHuman;
+
+	private int aiMove;
 
 	@Override
 	/**
@@ -138,15 +141,10 @@ public class MancalaView extends Application {
 	// Have AI make a turn
 	private void runAI() {
 		if (!model.getIsHumanGame()) {
-//			try {
-////				Thread.sleep(400); //TODO: move this
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 			ArtificialIntelligenceAgent aiAgent = new ArtificialIntelligenceAgent();
 			int aiMove = aiAgent.optimalMove(model, "");
 			model.moveStones(aiMove);
+			this.aiMove = aiMove;
 
 			// Recreate the board to reflect the changes made from stones being moved
 			fillBoard();
@@ -163,6 +161,14 @@ public class MancalaView extends Application {
 				alert.setTitle("Game Over");
 				alert.setContentText(model.displayWinner());
 				alert.showAndWait();
+
+				Alert newGameAlert = new Alert(Alert.AlertType.INFORMATION);
+				newGameAlert.setTitle("Starting new game");
+				newGameAlert.setContentText("");
+				newGameAlert.showAndWait();
+
+				model.initializeBoard();
+				fillBoard();
 			}
 
 		}
@@ -171,6 +177,8 @@ public class MancalaView extends Application {
 	/**
 	 * A method that instantiates and sets-up the mancala board of the GUI for user
 	 * interactivity
+	 * 
+	 * @throws InterruptedException
 	 */
 	public void fillBoard() {
 
@@ -186,6 +194,7 @@ public class MancalaView extends Application {
 
 		// Loop to create the individual board positions and buttons
 		for (int row = 0; row < 2; row++) {
+
 			for (int col = 0; col < 6; col++) {
 
 				// Create and format buttons for each position
@@ -229,28 +238,38 @@ public class MancalaView extends Application {
 
 						// Else, the current player made a valid move, so move the stones accordingly
 					} else {
-						model.moveStones(finalCounter);
+						if (model.getCurrentPlayer() == 0) {
+							model.moveStones(finalCounter);
 
-						// Recreate the board to reflect the changes made from stones being moved
-						fillBoard();
+							// Recreate the board to reflect the changes made from stones being moved
+							fillBoard();
 
-						// If the move caused the game to end...
-						if (model.isWinningState()) {
+							// If the move caused the game to end...
+							if (model.isWinningState()) {
 
-							// Add remaining stones to the other player's total
-							model.addRemainingStonesToPlayersStore();
+								// Add remaining stones to the other player's total
+								model.addRemainingStonesToPlayersStore();
 
-							// And alert the players that the game is over, stating who won or whether there
-							// was a tie
-							Alert alert = new Alert(Alert.AlertType.INFORMATION);
-							alert.setTitle("Game Over");
-							alert.setContentText(model.displayWinner());
-							alert.showAndWait();
+								// And alert the players that the game is over, stating who won or whether there
+								// was a tie
+								Alert alert = new Alert(Alert.AlertType.INFORMATION);
+								alert.setTitle("Game Over");
+								alert.setContentText(model.displayWinner());
+								alert.showAndWait();
+
+								Alert newGameAlert = new Alert(Alert.AlertType.INFORMATION);
+								newGameAlert.setTitle("Starting new game");
+								newGameAlert.setContentText("");
+								newGameAlert.showAndWait();
+
+								model.initializeBoard();
+								fillBoard();
+							}
 						}
 
 						if (!model.getIsHumanGame()) {
-							System.out.println("AI Turn:");
 							while (model.getCurrentPlayer() == 1) {
+								System.out.println("AI Turn:\n");
 								runAI();
 								System.out.println("\n-------------\n");
 							}
@@ -265,6 +284,10 @@ public class MancalaView extends Application {
 			}
 		}
 
+		setUpPlayerText(grid);
+	}
+
+	private void setUpPlayerText(GridPane grid) {
 		// Create a VBox to store the mancala board display
 		VBox vBox = new VBox();
 		vBox.setPadding(new Insets(10, 0, 10, 0));
@@ -281,7 +304,7 @@ public class MancalaView extends Application {
 		// Add some text to distinguish player 2's side of the board from player 1's
 		Text p2 = new Text("Player 2 Side");
 		if (!model.getIsHumanGame()) {
-			p2 = new Text("AI Side");
+			p2 = new Text("AI Side: My last optimal move was " + aiMove);
 		}
 		p2.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
 		vBox.getChildren().add(p2);
