@@ -1,7 +1,5 @@
 package mancala;
 
-import java.util.concurrent.TimeUnit;
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,9 +20,8 @@ import javafx.stage.Stage;
  * mancala board GUI for users to play on
  * 
  * @author Michael Opheim
- * @version 05/09/2023
+ * @version 05/15/2023
  */
-//TODO: comments, timing
 public class MancalaView extends Application {
 
 	/** A reference to the model of the GUI */
@@ -33,11 +30,11 @@ public class MancalaView extends Application {
 	/** The layout of the scene for the GUI */
 	private BorderPane root;
 
+	/** The Button to set the game to player versus AI mode */
 	private Button gameButtonAI;
 
+	/** The Button to set the game to two-player mode */
 	private Button gameButtonHuman;
-
-	private int aiMove;
 
 	@Override
 	/**
@@ -94,11 +91,12 @@ public class MancalaView extends Application {
 			startNewGame.setStyle(" -fx-background-color: #7d4d29; -fx-text-fill: black; ");
 			hBox.getChildren().add(startNewGame);
 
+			// Instantiate a button to allow the user to choose to play with an AI
 			gameButtonAI = new Button("Play with AI");
 			gameButtonAI.setOnAction((event) -> {
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setTitle("AI Game");
-				alert.setContentText("starting new AI game");
+				alert.setContentText("Starting new AI game");
 				alert.showAndWait();
 				hBox.getChildren().remove(gameButtonAI);
 				hBox.getChildren().add(gameButtonHuman);
@@ -109,6 +107,7 @@ public class MancalaView extends Application {
 			gameButtonAI.setPrefSize(100, 40);
 			gameButtonAI.setStyle(" -fx-background-color: #7d4d29; -fx-text-fill: black;");
 
+			// Instantiate a button to allow the user to choose to play a 2-player game
 			gameButtonHuman = new Button("2 Player Mode");
 			gameButtonHuman.setOnAction((event) -> {
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -138,13 +137,20 @@ public class MancalaView extends Application {
 		}
 	}
 
-	// Have AI make a turn
+	/**
+	 * A method that has our AI agent make a move during a particular mancala game
+	 */
 	private void runAI() {
+
+		// If the user is not playing a 2-player game
 		if (!model.getIsHumanGame()) {
+
+			// Create the AI agent
 			ArtificialIntelligenceAgent aiAgent = new ArtificialIntelligenceAgent();
+
+			// Have the AI find and make an optimal move for itself
 			int aiMove = aiAgent.optimalMove(model, "");
 			model.moveStones(aiMove);
-			this.aiMove = aiMove;
 
 			// Recreate the board to reflect the changes made from stones being moved
 			fillBoard();
@@ -154,6 +160,8 @@ public class MancalaView extends Application {
 
 				// Add remaining stones to the other player's total
 				model.addRemainingStonesToPlayersStore();
+				
+				fillBoard();
 
 				// And alert the players that the game is over, stating who won or whether there
 				// was a tie
@@ -162,12 +170,12 @@ public class MancalaView extends Application {
 				alert.setContentText(model.displayWinner());
 				alert.showAndWait();
 
+				// Start a new game afterwards
 				Alert newGameAlert = new Alert(Alert.AlertType.INFORMATION);
 				newGameAlert.setTitle("Starting new game");
-				newGameAlert.setContentText("");
+				newGameAlert.setContentText("A new game is starting...");
 				newGameAlert.showAndWait();
-
-				model.initializeBoard();
+				model.initializeBoard(); // Reset the board for the new game
 				fillBoard();
 			}
 
@@ -177,8 +185,6 @@ public class MancalaView extends Application {
 	/**
 	 * A method that instantiates and sets-up the mancala board of the GUI for user
 	 * interactivity
-	 * 
-	 * @throws InterruptedException
 	 */
 	public void fillBoard() {
 
@@ -194,7 +200,6 @@ public class MancalaView extends Application {
 
 		// Loop to create the individual board positions and buttons
 		for (int row = 0; row < 2; row++) {
-
 			for (int col = 0; col < 6; col++) {
 
 				// Create and format buttons for each position
@@ -217,9 +222,8 @@ public class MancalaView extends Application {
 				button.setOnAction((event) -> {
 
 					// If the current player clicked on the wrong side of the board somewhere, alert
-					// them
-					// Since the AI will not choose an invalid move this is only for the human
-					// players
+					// them (since the AI will not choose an invalid move this is only for the human
+					// players)
 					if (!model.isValidInput(model.getCurrentPlayer(), finalCounter)) {
 						String side = (finalRow == 0) ? "bottom" : "top";
 						Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -238,7 +242,8 @@ public class MancalaView extends Application {
 
 						// Else, the current player made a valid move, so move the stones accordingly
 					} else {
-						if (model.getCurrentPlayer() == 0 || (model.getCurrentPlayer() == 1 && model.getIsHumanGame())) {
+						if (model.getCurrentPlayer() == 0
+								|| (model.getCurrentPlayer() == 1 && model.getIsHumanGame())) {
 							model.moveStones(finalCounter);
 
 							// Recreate the board to reflect the changes made from stones being moved
@@ -249,7 +254,9 @@ public class MancalaView extends Application {
 
 								// Add remaining stones to the other player's total
 								model.addRemainingStonesToPlayersStore();
-
+								
+								fillBoard();
+								
 								// And alert the players that the game is over, stating who won or whether there
 								// was a tie
 								Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -257,17 +264,20 @@ public class MancalaView extends Application {
 								alert.setContentText(model.displayWinner());
 								alert.showAndWait();
 
+								// Start a new game afterwards
 								Alert newGameAlert = new Alert(Alert.AlertType.INFORMATION);
 								newGameAlert.setTitle("Starting new game");
-								newGameAlert.setContentText("");
+								newGameAlert.setContentText("A new game is starting...");
 								newGameAlert.showAndWait();
-
-								model.initializeBoard();
+								model.initializeBoard(); // Reset the board for the new game
 								fillBoard();
 							}
 						}
 
+						// If the user is not playing a 2-player game...
 						if (!model.getIsHumanGame()) {
+
+							// Have the AI play when it is its turn
 							while (model.getCurrentPlayer() == 1) {
 								System.out.println("AI Turn:\n");
 								runAI();
@@ -284,10 +294,18 @@ public class MancalaView extends Application {
 			}
 		}
 
+		// Set up the pieces of the GUI that pertain to the board and the players'
+		// stones, scores, etc.
 		setUpPlayerText(grid);
 	}
 
+	/**
+	 * A method that places game and player information on the GUI
+	 * 
+	 * @param grid The GridPane to hold the player GUI elements
+	 */
 	private void setUpPlayerText(GridPane grid) {
+
 		// Create a VBox to store the mancala board display
 		VBox vBox = new VBox();
 		vBox.setPadding(new Insets(10, 0, 10, 0));
@@ -304,7 +322,7 @@ public class MancalaView extends Application {
 		// Add some text to distinguish player 2's side of the board from player 1's
 		Text p2 = new Text("Player 2 Side");
 		if (!model.getIsHumanGame()) {
-			p2 = new Text("AI Side: My last optimal move was " + aiMove);
+			p2 = new Text("AI Side");
 		}
 		p2.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
 		vBox.getChildren().add(p2);

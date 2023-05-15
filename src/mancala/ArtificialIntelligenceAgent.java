@@ -1,24 +1,24 @@
 package mancala;
 
 /**
- * The deterministic AI agent for mancala
+ * The AI agent for mancala games
  * 
  * @author Michael Opheim
- * @version 05/09/2023
+ * @version 05/15/2023
  */
 public class ArtificialIntelligenceAgent {
 
-	/** A copy of the game in its current state for simulations */
-//	private MancalaModel aiModel;
-
 	/**
-	 * A method that picks the optimal move for a turn
+	 * A method that allows the AI agent to pick the optimal move for a turn
 	 * 
-	 * @param model A reference to the model
+	 * @param model           A reference to the model
+	 * @param recursiveIndent a String that indents console output based on
+	 *                        recursion for easier reading of the AI's logic
 	 * @return the most optimal move for the AI to take
 	 */
 	public int optimalMove(MancalaModel model, String recursiveIndent) {
 
+		// Create a variable to store the AI agent's optimal move
 		int optimalMove = 0;
 
 		// Store the state of the current game so we can run simulations on it without
@@ -34,18 +34,19 @@ public class ArtificialIntelligenceAgent {
 	}
 
 	/**
-	 * A method that does the work to find the most optimal move for the AI MAX
-	 * player
+	 * A method that does the work to find the most optimal move for the AI player
 	 * 
-	 * @param board        A simulated board of some state
-	 * @param currentDepth The depth of MINIMAX tree we are analyzing
+	 * @param board           A simulated board of some state
+	 * @param recursiveIndent a String that indents console output based on
+	 *                        recursion for easier reading of the AI's logic
 	 * @return The most optimal move for the AI player
 	 */
 	private BestMoveBoardValue findOptimalMove(MancalaModel aiModel, String recursiveIndent) {
 
-		// Create an object to the most optimal move for the AI players
+		// Create an object to the most optimal move for the AI player
 		BestMoveBoardValue optimalMove = new BestMoveBoardValue(-1, 0);
 
+		// Create a variable to save values during potential move analyses
 		int value = -1;
 
 		for (int hole = 0; hole < 6; hole++) {
@@ -53,44 +54,51 @@ public class ArtificialIntelligenceAgent {
 			// Make sure that the hole contains stones
 			if (aiModel.getBoard()[1][hole] != 0) {
 
+				// Create a copy of the state of the game for simulated analyses of moves
 				MancalaModel localCopy = new MancalaModel();
 				localCopy.copy(aiModel.getBoard(), 1, aiModel.getP1Store(), aiModel.getP2Store());
 
-				System.out.println(recursiveIndent + "Hole:" + hole + " Score before stone move: " + localCopy.getP2Store());
-
+				// Move stones from a particular hole
 				localCopy.moveStones(hole);
 
-				System.out.println(recursiveIndent + "Score after stone move" + localCopy.getP2Store());
-				
+				// If the move made causes the AI agent to get another turn, analyse possible
+				// subsequent turns
 				while (localCopy.getCurrentPlayer() == 1) {
+
+					// Recursively call the tail-recursive method to start analyzing moves again
+					// from this state onwards
 					int holeToCheck = optimalMove(localCopy, recursiveIndent + "   ");
-					System.out.println(recursiveIndent + "Best Hole: " + holeToCheck + " Score before: " + localCopy.getP2Store());
+
+					// Move stones according to the findings of the recursive analysis
 					localCopy.moveStones(holeToCheck);
-					System.out.println(recursiveIndent + "Score after: " + localCopy.getP2Store());
 				}
 
-				System.out.println(recursiveIndent + "hole: " + hole + " Potential value:" + localCopy.getP2Store() + "\n");
+				System.out.println(
+						recursiveIndent + "Hole: " + hole + " - Resulting Total Score: " + localCopy.getP2Store() + "\n");
 
+				// If the potential value is higher for a pocket than our current highest saved
+				// potential value, save it
 				if (value < localCopy.getP2Store()) {
 					value = localCopy.getP2Store();
 					optimalMove.setValue(value);
 					optimalMove.setHole(hole);
 				}
 			} else {
-				System.out.println(recursiveIndent + "hole " + hole + " was empty");
+				System.out.println(recursiveIndent + "Hole " + hole + " is empty\n");
 			}
 		}
 
-		System.out.println(recursiveIndent + "Most optimal move: " + optimalMove.getHole() + " Value: " + optimalMove.getValue());
+		System.out.println(
+				recursiveIndent + "Most optimal move: " + optimalMove.getHole() + " Value: " + optimalMove.getValue());
 
-		return optimalMove;
+		return optimalMove; // Return the most optimal move for the AI agent
 	}
 
 	/**
 	 * A class to store the best move possible for the AI MAX player
 	 * 
 	 * @author Michael Opheim
-	 * @version 05/09/2023
+	 * @version 05/15/2023
 	 */
 	private class BestMoveBoardValue {
 

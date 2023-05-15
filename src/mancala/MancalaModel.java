@@ -5,7 +5,7 @@ package mancala;
  * adjusting the board after each turn, following the rules of mancala
  * 
  * @author Michael Opheim
- * @version 05/09/2023
+ * @version 05/15/2023
  */
 public class MancalaModel {
 
@@ -18,6 +18,7 @@ public class MancalaModel {
 	/** Player 2's store */
 	private int p2Store;
 
+	/** A boolean that tracks whether a two-player or AI game is being played */
 	private boolean isHumanGame;
 
 	/**
@@ -39,13 +40,24 @@ public class MancalaModel {
 		isHumanGame = false;
 	}
 
+	/**
+	 * A method that makes a copy of the current state of the game
+	 * 
+	 * @param currentBoard The current state of the board
+	 * @param player       The current player
+	 * @param p1Store      The state of player 1's store
+	 * @param p2Store      The state of player 2's store
+	 */
 	public void copy(int[][] currentBoard, int player, int p1Store, int p2Store) {
+
+		// Copy the board
 		for (int row = 0; row < currentBoard.length; row++) {
 			for (int col = 0; col < currentBoard[row].length; col++) {
 				board[row][col] = currentBoard[row][col];
 			}
 		}
 
+		// Save the current player and the stores of the players
 		row = player;
 		this.p1Store = p1Store;
 		this.p2Store = p2Store;
@@ -88,10 +100,21 @@ public class MancalaModel {
 		return p2Store;
 	}
 
+	/**
+	 * The setter for establishing the game mode
+	 * 
+	 * @param gameType The type of game to be played (an AI game or a two-player
+	 *                 game)
+	 */
 	public void setIsHumanGame(boolean gameType) {
 		isHumanGame = gameType;
 	}
 
+	/**
+	 * The getter for the game mode of a particular game
+	 * 
+	 * @return the current game mode of a particular game
+	 */
 	public boolean getIsHumanGame() {
 		return isHumanGame;
 	}
@@ -212,6 +235,13 @@ public class MancalaModel {
 			p2Store += rowSums[1];
 		} else if (rowSums[1] == 0) {
 			p1Store += rowSums[0];
+		}
+
+		// Empty the board after the stones have been moved
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board[row].length; col++) {
+				board[row][col] = 0;
+			}
 		}
 	}
 
